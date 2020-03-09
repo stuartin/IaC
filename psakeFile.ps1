@@ -23,7 +23,6 @@ task Setup -Depends Test {
     Write-Output "Setting Azure CLI defaults..."
     $defaults = @(
         "location=$ENV:AZURE_LOCATION", 
-        "acr=$ENV:AZURE_ACR_NAME"
     )
     az configure --defaults @defaults
     az configure --list-defaults
@@ -35,7 +34,7 @@ task Deploy -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
         "--name", "$ENV:AZURE_RG_NAME", 
-        "--tags", "test2"
+        "--tags", "$ENV:ENV_VERSION"
     )
     az group create @params
 

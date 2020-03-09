@@ -1,8 +1,10 @@
 variables:
-  ENV_TAG: au_dev_0.0.1
+  APP_NAME: IaC
+  ENV_TAG: dev
+  ENV_VERSION: 0.0.1  
+  ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
   AZURE_LOCATION: australiasoutheast
-  AZURE_RG_NAME: $(ENV_TAG)_rg
-  AZURE_ACR_NAME: $(ENV_TAG)_acr
+  AZURE_RG_NAME: $(ENV_PREFIX)_rg
 
 trigger:
 - master
