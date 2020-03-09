@@ -14,7 +14,7 @@ steps:
     inputs:
       filePath: 'deploy.ps1'
       arguments: '
-        --Bootstrap
+        -Bootstrap
       '
       failOnStderr: true
       pwsh: true
