@@ -16,8 +16,7 @@ task Setup -Depends Test {
         "--service-principal"
         "--username", "$ENV:AZURE_SP_USERNAME",
         "--password", "$ENV:AZURE_SP_PASSWORD",
-        "--tenant", "$ENV:AZURE_SP_TENANTID",
-        "--allow-no-subscription"
+        "--tenant", "$ENV:AZURE_SP_TENANTID"
     )
     az login @params
     

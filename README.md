@@ -13,10 +13,21 @@
   Account Type | This org only (single tenant)
 
 - Click register, and wait until the application has been created
+
+### Create new secret
+
 - Select Certificates and Secrets for the app
 - Click New client secret
 - Provide a description and an expiry date
 - Copy the secret that is created
+
+### Give Service Principal access to subscription
+
+ - Open Subscriptions > Your subscription
+ - Select Access Control (IAM)
+ - Select Role Assignments > Add > Add Role Assignment
+ - Select Contributor and find the newly created Service Principal
+ - Click Save
 
 ## Pipeline Variables
 
