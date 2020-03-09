@@ -22,5 +22,6 @@
 
  Name | Type | Description
  --- | --- | ---
- AZURE_SP_USERNAME | string | The application id from the Service Principal
- AZURE_SP_PASSWORD | secure_string | The secret from the Service Principal
+ azure.sp.username | string | The application id from the Service Principal
+ azure.sp.password | secret | The secret from the Service Principal
+ azure.sp.tenant | string | The tenant id for where the Service Principal exists
