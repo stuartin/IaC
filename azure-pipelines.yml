@@ -21,4 +21,4 @@ steps:
       failOnStderr: true
       pwsh: true
     env:
-      AZURE_SP_PASSWORD: $(AZURE_SP_PASSWORD)
+      AZURE_SP_PASSWORD: $(azure.sp.password)
