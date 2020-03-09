@@ -1,5 +1,11 @@
 task default -depends Test
 
+task Debug {
+    Write-Debug "$ENV:AZURE_SP_USERNAME"
+    Write-Debug "$ENV:AZURE_SP_PASSWORD"
+    Write-Debug "$ENV:AZURE_SP_TENANT"
+}
+
 task Test {
     Invoke-Pester "$PSScriptRoot\tests"
 }
