@@ -1,7 +1,8 @@
 variables:
   ENV_TAG: au_dev_0.0.1
   AZURE_LOCATION: australiasoutheast
-  AZURE_ACR_NAME: $(global_variable)_acr
+  AZURE_RG_NAME: $(ENV_TAG)_rg
+  AZURE_ACR_NAME: $(ENV_TAG)_acr
 
 trigger:
 - master
