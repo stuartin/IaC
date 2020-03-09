@@ -5,17 +5,24 @@ task Test {
 }
 
 task Setup -Depends Test {
+    Write-Output "Logging into Azure environment..."
+    $params = @(
+        "--service-principal"
+        "--username", "$ENV:AZURE_SP_USERNAME",
+        "--password", "$ENV:AZURE_SP_PASSWORD",
+        "--tenant", "$ENV:AZURE_SP_TENANTID"        
+    )
+    az login @params
+    
     Write-Output "Setting Azure CLI defaults..."
-    Write-Output "AZURE LOCATION: $ENV:AZURE_LOCATION"
-    Write-Output "AZURE LOCATION: $ENV:AZURE_ACR_NAME"
-
     $defaults = @(
         "location=$ENV:AZURE_LOCATION", 
         "acr=$ENV:AZURE_ACR_NAME"
     )
-
     az configure --defaults @defaults
     az configure --list-defaults
+
+    
 }
 
 task Deploy -Depends Test, Setup {
