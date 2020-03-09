@@ -71,3 +71,30 @@ The base project will create a new **Resource Group** using a **Service Principa
  azure.sp.username | string | The application id from the Service Principal
  azure.sp.password | secret | The secret from the Service Principal
  azure.sp.tenant | string | The tenant id for where the Service Principal exists
+
+ # Managing Versions/Releases
+
+ To keep track of Infrastructure versions, it is imperative to deploy each resource using a **ENV_PREFIX**, this includes the app name, environment and version that is being deployed. 
+ Production releases should always enforce the Infrastructure Version within the `.\azure-pipelines.yml` file.
+
+ ## Production
+
+ 1. Ensure that all tests and code are working as required.
+ 1. Update the `.\azure-pipelines.yml` file with with the current release version to publish
+    ```yaml
+    variables:
+      APP_NAME: IaC
+      ENV_TAG: prod
+      ENV_VERSION: v0.0.1
+      ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
+
+    trigger:
+      branches:
+        include:
+          - refs/tags/v0.0.1
+    ```
+1. Commit or submit a PR to your master branch.
+1. Create a new release that matches the above tag - _v0.0.1_
+1. The production environment will be deployed at the specified version
+
+## Deveopment
