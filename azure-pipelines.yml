@@ -1,19 +1,20 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+variables:
+  ENV_TAG: au_dev_0.0.1
+  AZURE_LOCATION: australiasoutheast
+  AZURE_ACR_NAME: $(global_variable)_acr
 
 trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-18.04'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - task: PowerShell@2
+    inputs:
+      filePath: 'deploy.ps1'
+      arguments: '
+        --Bootstrap
+      '
+      failOnStderr: true
+      pwsh: true
