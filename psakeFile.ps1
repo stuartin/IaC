@@ -22,7 +22,7 @@ task Setup -Depends Test {
     
     Write-Output "Setting Azure CLI defaults..."
     $defaults = @(
-        "location=$ENV:AZURE_LOCATION", 
+        "location=$ENV:AZURE_LOCATION"
     )
     az configure --defaults @defaults
     az configure --list-defaults
