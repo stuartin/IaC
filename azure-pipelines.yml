@@ -15,6 +15,7 @@ steps:
       filePath: 'deploy.ps1'
       arguments: '
         -Bootstrap
+        -Task Deploy
       '
       failOnStderr: true
       pwsh: true
