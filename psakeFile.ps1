@@ -6,9 +6,12 @@ task Test {
 
 task Setup -Depends Test {
     Write-Output "Setting Azure CLI defaults..."
+    Write-Output "AZURE LOCATION: $ENV:AZURE_LOCATION"
+    Write-Output "AZURE LOCATION: $ENV:AZURE_ACR_NAME"
+
     $defaults = @(
-        "--location", "$ENV:AZURE_LOCATION", # default geo location
-        "--acr", "$ENV:AZURE_ACR_NAME" # default acr (azure container registry) name
+        "location=$ENV:AZURE_LOCATION", 
+        "acr=$ENV:AZURE_ACR_NAME"
     )
 
     az configure --defaults @defaults
@@ -22,7 +25,7 @@ task Deploy -Depends Test, Setup {
         "--tags", "test2"
     )
     az group create @params
-    
+
     #az appservice plan create --name $(appserviceplan)  --resource-group $(resourceGroupName) --sku FREE
     #az webapp create --name $(apiapp) --resource-group $(resourceGroupName) --plan $(appserviceplan) 
     #az webapp identity assign -g $(resourceGroupName)  -n $(apiapp)

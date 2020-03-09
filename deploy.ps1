@@ -38,7 +38,6 @@ if ($PSCmdlet.ParameterSetName -eq 'Help') {
     Get-PSakeScriptTasks -buildFile $psakeFile |
         Format-Table -Property Name, Description, Alias, DependsOn
 } else {
-    Get-Module -ListAvailable
     Invoke-psake -buildFile $psakeFile -taskList $Task -nologo -properties $Properties
     exit ([int](-not $psake.build_success))
 }
