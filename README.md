@@ -105,6 +105,8 @@ Each branch has a seperate pipeline. Only releases in `master` will be deployed 
 
  ## Production
 
+Production deployments are handled using github releases/tags.
+
  1. Ensure that all tests and code are working as required.
  1. Update the `.\azure-pipelines-prod.yml` file with with the current release version to publish
     ```yaml
@@ -123,4 +125,15 @@ Each branch has a seperate pipeline. Only releases in `master` will be deployed 
 1. Create a new release that matches the version in the `.\azure-pipelines-prod.yml` file - _v0.0.1_
 1. The production environment will be deployed at the specified version
 
-## Deveopment
+## Development
+
+The dev pipeline will always run when a new commit is detected in the **dev** branch.
+
+## Rollback
+
+If you need to roll back **prod** to a previous release, run the prod release pipeline manually and specify the previous release tag.
+
+1. Select **Pipelines** > **prod** > **Run Pipeline**
+1. Enter **master** for the branch and the **release tag** for the commit
+1. Click **Run**
+
