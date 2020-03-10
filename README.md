@@ -14,10 +14,18 @@ The `.\psakeFile.ps1` ensures that any dependent tasks are run first before depl
 
 The base project will create a new **Resource Group** using a **Service Principal**, extend the `Deploy` Task in the `.\psakeFile.ps1` to extend this workflow.
 1. Ensure that a **Service Principal** is created with access to your Azure Subscription.
-1. Clone this repository to your own GitHub repo and update the `azure-pipelines.yml`
+1. Create a new repo in github (manually), duplicate this one and remove temp folder
     ```PowerShell
     git clone --bare https://github.com/stuartin/IaC.git
-    cd IaC
+    cd IaC.git
+    git push --mirror https://github.com/exampleuser/new-repository.git
+    cd..
+    Remove-Item IaC.git --Recurse --Force
+    ```
+1. Clone your new github repo and open vscode
+    ```PowerShell
+    git clone https://github.com/exampleuser/new-repository.git
+    cd <new_repository>
     code .
     ```
 1. Update `azure-pipelines-dev.yml` and `azure-pipelines-prod.yml` with the below variables based on your app
@@ -30,11 +38,12 @@ The base project will create a new **Resource Group** using a **Service Principa
     ```PowerShell
     git add *
     git commit -m "set app name and version"
-    git push --mirror https://github.com/exampleuser/new-repository.git
+    git push
     ```
+1. Repeat the last two steps in the **dev** branch
 
 1. Create a new [Azure DevOps](https://dev.azure.com/) project
-1. Create a new **Pipeline** for dev - specify your GitHub repo, use the `azure-pipelines-dev.yml` file.
+1. Create a new **Pipeline** for dev - specify your GitHub repo, use the `azure-pipelines-dev.yml` file in the **dev** branch.
 1. Add the **Mandatory Pipeline Variables** and click save/run
 1. Rename the pipeline to **IaC - dev** (Pipelines > More Actions > Rename)
 1. Create a new **Pipeline** for prod - specify your GitHub repo, use the `azure-pipelines-prod.yml` file. 
@@ -87,7 +96,7 @@ Each branch has a seperate pipeline. Only releases in `master` will be deployed 
  --- | --- | ---
  azure.sp.username | string | The application id from the Service Principal
  azure.sp.password | secret | The secret from the Service Principal
- azure.sp.tenant | string | The tenant id for where the Service Principal exists
+ azure.sp.tenantid | string | The tenant id for where the Service Principal exists
 
  # Managing Versions/Releases
 

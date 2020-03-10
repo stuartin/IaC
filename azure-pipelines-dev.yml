@@ -10,8 +10,6 @@ trigger:
   branches:
     include:
     - dev
-    exclude:
-    - '*'
 
 pool:
   vmImage: 'ubuntu-18.04'
