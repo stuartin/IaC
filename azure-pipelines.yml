@@ -24,3 +24,8 @@ steps:
       pwsh: true
     env:
       AZURE_SP_PASSWORD: $(azure.sp.password)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'prod_release'
+      publishLocation: 'Container'
