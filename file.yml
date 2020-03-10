@@ -1,0 +1,30 @@
+variables:
+  APP_NAME: IaC
+  ENV_TAG: dev
+  ENV_VERSION: v0.0.1  
+  ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
+  AZURE_LOCATION: australiasoutheast
+  AZURE_RG_NAME: $(ENV_PREFIX)_rg
+
+trigger:
+  branches:
+    include:
+    - dev
+    exclude:
+    - '*'
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+steps:
+  - task: PowerShell@2
+    inputs:
+      filePath: 'deploy.ps1'
+      arguments: '
+        -Bootstrap
+        -Task Deploy
+      '
+      failOnStderr: true
+      pwsh: true
+    env:
+      AZURE_SP_PASSWORD: $(azure.sp.password)
