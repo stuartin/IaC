@@ -1,6 +1,6 @@
 variables:
   APP_NAME: IaC
-  ENV_TAG: dev
+  ENV_TAG: prod
   ENV_VERSION: v0.0.1  
   ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
   AZURE_LOCATION: australiasoutheast

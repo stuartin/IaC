@@ -20,7 +20,7 @@ The base project will create a new **Resource Group** using a **Service Principa
     cd IaC
     code .
     ```
-1. Update the below variables with your app details
+1. Update `azure-pipelines-dev.yml` and `azure-pipelines-prod.yml` with the below variables based on your app
     ```PowerShell
     APP_NAME: <your_app_name>
     ENV_TAG: <prod / dev>
@@ -28,6 +28,8 @@ The base project will create a new **Resource Group** using a **Service Principa
     ```
 1. Save and commit to Github
     ```PowerShell
+    git add *
+    git commit -m "set app name and version"
     git remote add origin <new_git_url>
     git push -u origin master
     ```
