@@ -31,9 +31,28 @@ The base project will create a new **Resource Group** using a **Service Principa
     git remote add origin <new_git_url>
     git push -u origin master
     ```
+1. Add the **dev** branch
+    ```PowerShell
+    git branch dev
+    git checkout dev
+    git add *
+    git commit -m "add dev"
+    git push --set-upstream origin dev
+    ```
+
 1. Create a new [Azure DevOps](https://dev.azure.com/) project
-1. Create a new **Pipeline** and specify your GitHub repo, use the **existing yaml file**
+1. Create a new **Pipeline** for dev - specify your GitHub repo, use the `azure-pipelines-dev.yml` file.
 1. Add the **Mandatory Pipeline Variables** and click save/run
+1. Rename the pipeline to **IaC - dev** (Pipelines > More Actions > Rename)
+1. Create a new **Pipeline** for prod - specify your GitHub repo, use the `azure-pipelines-prod.yml` file. 
+1. Add the **Mandatory Pipeline Variables** and click save/run
+1. Rename the pipeline to **IaC - prod** (Pipelines > More Actions > Rename)
+
+**IaC - dev** 
+> Pipeline will trigger whenever a new commit is added to the **dev** branch.
+
+**IaC - prod**
+> Pipeline will trigger whenever a new tag is added to **master** and that tag is referenced inside the `azure-pipelines-prod.yml` file.
 
 # Gitflow
 
