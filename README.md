@@ -16,7 +16,7 @@ The base project will create a new **Resource Group** using a **Service Principa
 1. Ensure that a **Service Principal** is created with access to your Azure Subscription.
 1. Clone this repository to your own GitHub repo and update the `azure-pipelines.yml`
     ```PowerShell
-    git clone https://github.com/stuartin/IaC.git
+    git clone --bare https://github.com/stuartin/IaC.git
     cd IaC
     code .
     ```
@@ -30,16 +30,7 @@ The base project will create a new **Resource Group** using a **Service Principa
     ```PowerShell
     git add *
     git commit -m "set app name and version"
-    git remote add origin <new_git_url>
-    git push -u origin master
-    ```
-1. Add the **dev** branch
-    ```PowerShell
-    git branch dev
-    git checkout dev
-    git add *
-    git commit -m "add dev"
-    git push --set-upstream origin dev
+    git push --mirror https://github.com/exampleuser/new-repository.git
     ```
 
 1. Create a new [Azure DevOps](https://dev.azure.com/) project
