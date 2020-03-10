@@ -35,6 +35,11 @@ The base project will create a new **Resource Group** using a **Service Principa
 1. Create a new **Pipeline** and specify your GitHub repo, use the **existing yaml file**
 1. Add the **Mandatory Pipeline Variables** and click save/run
 
+# Gitflow
+
+There is a `dev` branch and `master`.
+Each branch has a seperate pipeline. Only releases in `master` will be deployed to prod.
+
 # Requirements
 
 ## Service Principal
