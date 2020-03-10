@@ -80,7 +80,7 @@ The base project will create a new **Resource Group** using a **Service Principa
  ## Production
 
  1. Ensure that all tests and code are working as required.
- 1. Update the `.\azure-pipelines.yml` file with with the current release version to publish
+ 1. Update the `.\azure-pipelines-prod.yml` file with with the current release version to publish
     ```yaml
     variables:
       APP_NAME: IaC
@@ -94,7 +94,7 @@ The base project will create a new **Resource Group** using a **Service Principa
           - refs/tags/v0.0.1
     ```
 1. Commit or submit a PR to your master branch.
-1. Create a new release that matches the above tag - _v0.0.1_
+1. Create a new release that matches the version in the `.\azure-pipelines-prod.yml` file - _v0.0.1_
 1. The production environment will be deployed at the specified version
 
 ## Deveopment
