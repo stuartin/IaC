@@ -2,30 +2,6 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-<# task Test {
-    Invoke-Pester "$PSScriptRoot\tests"
-}
-
-task Setup -Depends Test {
-    Write-Output "Logging into Azure environment..."
-    $params = @(
-        "--service-principal"
-        "--username", "$ENV:AZURE_SP_USERNAME",
-        "--password", "$ENV:AZURE_SP_PASSWORD",
-        "--tenant", "$ENV:AZURE_SP_TENANTID"
-    )
-    az login @params
-    
-    Write-Output "Setting Azure CLI defaults..."
-    $defaults = @(
-        "location=$ENV:AZURE_LOCATION"
-    )
-    az configure --defaults @defaults
-    az configure --list-defaults
-
-    
-} #>
-
 task Deploy -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
