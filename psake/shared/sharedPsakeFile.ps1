@@ -8,7 +8,7 @@ task Setup {
     Write-Output "Setting Azure CLI defaults..."
 
     # update .config file
-    $configFile = "$HOME/.azure/config"
+    $configFile = "$AZURE_CONFIG_DIR/config"
     $pattern = '\[core]'
     $replace = "[core]`r`noutput=table"
 
