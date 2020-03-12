@@ -32,9 +32,10 @@ task Deploy -Depends Test, Setup {
     az group create @params
 
     Write-Output "Creating Azure Container Registry..."
+    $validAcrName = $ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", ""
     $params = @(
         "--resource-group", "$ENV:AZURE_RG_NAME", 
-        "--name", "$ENV:AZURE_ACR_NAME",
+        "--name", "$validAcrName",
         "--sku", "Basic"
     )
     az acr create @params
