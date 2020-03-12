@@ -1,11 +1,12 @@
-#task default -depends Test
-
 task Test {
     Invoke-Pester "..\tests"
 }
 
 task Setup {
     Write-Output "Setting Azure CLI defaults..."
+
+    which az
+    whereis az
 
     # update .config file
     $configFile = "$AZURE_CONFIG_DIR/config"
