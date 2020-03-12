@@ -30,37 +30,36 @@ task Deploy -Depends Test, Setup {
         "--location", "australiasoutheast"
     )
     $command = [ScriptBlock]::Create("
-      az group create @params
+        az group create @params
     ")
     exec $command
 
     Write-Output "Creating Azure Container Registry..."
-    $validAcrName = $ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", ""
+    $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
     $params = @(
         "--resource-group", "$ENV:AZURE_RG_NAME", 
         "--name", "$validAcrName",
         "--sku", "Basic"
     )
     $command = [ScriptBlock]::Create("
-      az acr create @params
+        az acr create @params
     ")
     exec $command
 
     Write-Output "Logging into ACR..."
     $command = [ScriptBlock]::Create("
-      az acr login --name $validAcrName
+        az acr login --name $validAcrName
     ")   
     exec $command 
 
     Write-Output "Building and deploying new image..."
     $params = @(
-        "--registry",
-        "--acrName", "$validAcrName", 
+        "--registry", "$validAcrName", 
         "$ENV:GITHUB_URI",
         "--image", "$ENV:AZURE_ACR_IMAGE_NAME"
     )
     $command = [ScriptBlock]::Create("
-      az acr build create @params
+        az acr build create @params
     ")   
     exec $command 
     
