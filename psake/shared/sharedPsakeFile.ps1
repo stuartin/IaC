@@ -5,9 +5,6 @@ task Test {
 task Setup {
     Write-Output "Setting Azure CLI defaults..."
 
-    which az
-    whereis az
-
     # update .config file
     $configFile = "$HOME/.azure/config"
     $pattern = '\[core]'
