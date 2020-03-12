@@ -55,13 +55,12 @@ task Deploy -Depends Test, Setup {
     Write-Output "Building and deploying new image..."
     $params = @(
         "--registry", "$validAcrName", 
-        "$ENV:GITHUB_URI",
-        "--image", "$ENV:AZURE_ACR_IMAGE_NAME"
+        "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
+        "$ENV:GITHUB_URI"
     )
     $command = [ScriptBlock]::Create("
-        az acr build create @params
+        az acr build @params
     ")   
     exec $command 
     
-
 }

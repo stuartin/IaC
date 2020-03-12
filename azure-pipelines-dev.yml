@@ -5,8 +5,8 @@ variables:
   ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
   AZURE_LOCATION: australiasoutheast
   AZURE_RG_NAME: $(ENV_PREFIX)_rg
-  AZURE_ACR_NAME: $(APP_NAME)_$(ENV_TAG)_acr
-  AZURE_ACR_IMAGE_NAME: SampleWebApp:latest
+  AZURE_ACR_NAME: $(ENV_PREFIX)_acr
+  AZURE_ACR_IMAGE_NAME: samplewebapp:latest
   GITHUB_URI: https://github.com/stuartin/az-devops.git#master:SampleWebApp
 
 trigger:
