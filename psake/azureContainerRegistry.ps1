@@ -7,6 +7,7 @@
 
   .PARAMETER AZURE_ACR_NAME
     [string]ENV:AZURE_ACR_NAME - The name of the Azure Resource Container (ACR)
+            Must conform to ^[a-zA-Z0-9]*$
 
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)
@@ -17,7 +18,7 @@
   .NOTES
     Author: https://github.com/stuartin
 #>
-
+$ErrorActionPreference = 'Stop'
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
