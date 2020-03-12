@@ -58,9 +58,18 @@ task Deploy -Depends Test, Setup {
         "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
         "$ENV:GITHUB_URI"
     )
-    $command = [ScriptBlock]::Create("
-        az acr build @params
-    ")   
-    exec $command 
-    
+
+    # acr build throws warning messages to STDERR output stream
+    # causing exec to report a failure, unable to use exec to test for success.
+    # Just execute the command outside of exec.
+    #
+    # not likely to be changed: https://github.com/Azure/acr/issues/162
+    #
+    # $command = [ScriptBlock]::Create("
+    #     az acr build @params
+    # ")   
+    # exec $command 
+
+    az acr build @params
+
 }
