@@ -7,13 +7,12 @@
 
   .PARAMETER AZURE_ACR_NAME
     [string]ENV:AZURE_ACR_NAME - The name of the Azure Resource Container (ACR)
-            Must conform to ^[a-zA-Z0-9]*$
 
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)
 
   .PARAMETER GITHUB_URI
-    [string]ENV:GITHUB_URI - The uri to the (https://github.com/user/repo.git#master:Subfolder)
+    [string]ENV:GITHUB_URI - The uri to the public repo (https://github.com/user/repo.git#master:Subfolder)
   
   .NOTES
     Author: https://github.com/stuartin
@@ -70,6 +69,5 @@ task Deploy -Depends Test, Setup {
     # ")   
     # exec $command 
 
-    az acr build @params
-
+    az acr build @params n>&1
 }
