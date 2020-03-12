@@ -9,11 +9,15 @@ task Setup {
     whereis az
 
     # update .config file
-    $configFile = "$AZURE_CONFIG_DIR/config"
+    $configFile = "$HOME/.azure/config"
     $pattern = '\[core]'
     $replace = "[core]`r`noutput=table"
 
-    (Get-Content -Path $configFile -Raw) -replace $pattern,$replace | Set-Content -Path $configFile
+    if (-not (Test-Path -Path $configFile)) {
+        New-Item -Type File -Path $configFile -Value $replace -Force | Out-Null
+    } else {
+        (Get-Content -Path $configFile -Raw) -replace $pattern,$replace | Set-Content -Path $configFile
+    }  
 
     # set cli defaults
     $defaults = @(
