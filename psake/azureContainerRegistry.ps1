@@ -29,7 +29,7 @@ task Deploy -Depends Test, Setup {
         "--name", "$ENV:AZURE_RG_NAME", 
         "--tags", "version=$ENV:ENV_VERSION", "app=$ENV:APP_NAME", "env=$ENV:ENV_TAG"
     )
-    az group create @params
+    exec az group create @params
 
     Write-Output "Creating Azure Container Registry..."
     $validAcrName = $ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", ""
@@ -38,18 +38,18 @@ task Deploy -Depends Test, Setup {
         "--name", "$validAcrName",
         "--sku", "Basic"
     )
-    az acr create @params
+    exec az acr create @params
 
     Write-Output "Logging into ACR..."
-    az acr login --name $ENV:AZURE_ACR_NAME
+    exec az acr login --name $validAcrName
 
     Write-Output "Building and deploying new image..."
     $params = @(
         "--registry",
-        "--acrName", "$ENV:AZURE_ACR_NAME", 
+        "--acrName", "$validAcrName", 
         "$ENV:GITHUB_URI",
         "--image", "$ENV:AZURE_ACR_IMAGE_NAME"
     )
-    az acr build create @params
+    exec az acr build create @params
 
 }
