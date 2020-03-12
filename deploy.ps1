@@ -1,7 +1,11 @@
 [cmdletbinding(DefaultParameterSetName = 'Task')]
 param(
-    # Deploy task(s) to execute
+    # psake file to execute
     [parameter(ParameterSetName = 'task', position = 0)]
+    [string]$PsakeFile = "$PSScriptRoot\psake\resourceGroup.ps1",
+
+    # Deploy task(s) to execute
+    [parameter(ParameterSetName = 'task', position = 1)]
     [string[]]$Task = 'default',
 
     # Bootstrap dependencies
@@ -33,11 +37,10 @@ if ($Bootstrap.IsPresent) {
 }
 
 # Execute psake task(s)
-$psakeFile = './psakeFile.ps1'
 if ($PSCmdlet.ParameterSetName -eq 'Help') {
-    Get-PSakeScriptTasks -buildFile $psakeFile |
+    Get-PSakeScriptTasks -buildFile $PsakeFile |
         Format-Table -Property Name, Description, Alias, DependsOn
 } else {
-    Invoke-psake -buildFile $psakeFile -taskList $Task -nologo -properties $Properties
-    exit ([int](-not $psake.build_success))
+    Invoke-psake -buildFile $PsakeFile -taskList $Task -nologo -properties $Properties
+    exit ([int](-not $Psake.build_success))
 }

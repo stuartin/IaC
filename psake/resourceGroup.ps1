@@ -1,6 +1,8 @@
+include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
+
 task default -depends Test
 
-task Test {
+<# task Test {
     Invoke-Pester "$PSScriptRoot\tests"
 }
 
@@ -22,7 +24,7 @@ task Setup -Depends Test {
     az configure --list-defaults
 
     
-}
+} #>
 
 task Deploy -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
