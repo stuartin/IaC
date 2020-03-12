@@ -26,10 +26,11 @@ task default -depends Test
 task Deploy -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
-        "--name", "$ENV:AZURE_RG_NAME", 
-        "--tags", "version=$ENV:ENV_VERSION", "app=$ENV:APP_NAME", "env=$ENV:ENV_TAG"
+        "--name", "$ENV:AZURE_RG_NAME",
+        "--location", "australiasoutheast"
     )
-    exec az group create @params
+    $command = [ScriptBlock]::Create("az group create @params")
+    exec $command
 
     Write-Output "Creating Azure Container Registry..."
     $validAcrName = $ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", ""
@@ -38,10 +39,12 @@ task Deploy -Depends Test, Setup {
         "--name", "$validAcrName",
         "--sku", "Basic"
     )
-    exec az acr create @params
+    $command = [ScriptBlock]::Create("exec az acr create @params")
+    exec $command
 
     Write-Output "Logging into ACR..."
-    exec az acr login --name $validAcrName
+    $command = [ScriptBlock]::Create("exec az acr login --name $validAcrName")   
+    exec $command 
 
     Write-Output "Building and deploying new image..."
     $params = @(
@@ -50,6 +53,8 @@ task Deploy -Depends Test, Setup {
         "$ENV:GITHUB_URI",
         "--image", "$ENV:AZURE_ACR_IMAGE_NAME"
     )
-    exec az acr build create @params
+    $command = [ScriptBlock]::Create("exec az acr build create @params")   
+    exec $command 
+    
 
 }
