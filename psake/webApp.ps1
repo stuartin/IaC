@@ -22,8 +22,22 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-task Deploy -Depends Test, Setup {
-    Write-Output "Launching Web App"
+task Deploy -Depends Test, Setup {   
+  Write-Output "Building WebApp based on image..."
+  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+  $params = @(
+    "--name", "$validAcrName",   
+    "--registry-rg", "$ENV:AZURE_RG_NAME", 
+    "--registery-name", "$ENV:AZURE_ACR_NAME",
+    "--docker-custom-image-name", "$ENV:AZURE_ACR_IMAGE_NAME",
+    "$ENV:GITHUB_URI"
+  )
+  $command = [ScriptBlock]::Create("
+      az webapp container up @params
+  ")
+  exec $command
+  
+
 }
 
 

@@ -57,13 +57,14 @@ task Build -Depends Test, Setup {
         "$ENV:GITHUB_URI"
     )
 
-    # acr build throws warning messages to STDERR output stream
-    # causing exec to report a failure, unable to use exec to test for success
-    # even when setting $ErrorActionPreferenace
-    # just execute the command outside of exec.
-    # behaviour not likely to be changed: https://github.com/Azure/acr/issues/162
+    # az acr build throws WARNING messages to STDERR output stream (https://github.com/Azure/acr/issues/162)
+    # causing exec (psake) to report a failure, unable to use exec to test for success
+    # must execute the command outside of exec.
     #
-    # does not work
+    # or set azure-pipelines.yml with the below config:
+    # failOnStderr: true'
+    #
+    # below does not work
     # $command = [ScriptBlock]::Create("
     #     az acr build @params 2> $null
     # ")   
@@ -71,24 +72,7 @@ task Build -Depends Test, Setup {
 
     # the below will redirect STDERR (Error Stream) to $null, command
     # could fail but would report success
-    # needed otherwise builds fail due to above use of az acr build
     $ErrorActionPreference = 'SilentlyContinue'
     az acr build @params 2> $null
     $ErrorActionPreference = 'Stop'
-
-    Write-Output "Building WebApp based on image..."
-    $params = @(
-      "--name", "$validAcrName",   
-      "--registry-name", "$validAcrName", 
-      "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
-      "$ENV:GITHUB_URI"
-  )
-  $command = [ScriptBlock]::Create("
-      az acr create @params
-      az webapp container up -n AppName --registry-rg ContainerRegistryResourceGroup --registry-name ContainerRegistryName
-  ")
-  exec $command
-  
-
-
 }
