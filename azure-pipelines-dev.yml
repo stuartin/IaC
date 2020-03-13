@@ -41,7 +41,7 @@ jobs:
     pool:
       vmImage: 'ubuntu-18.04'
     variables:
-      job_variable1: value1    # this is only available in job1
+      PSAKE_FILE_NAME: 'webApp.ps1'
     steps:
     - task: PowerShell@2
       inputs:
