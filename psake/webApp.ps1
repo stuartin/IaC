@@ -22,18 +22,28 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-task Deploy -Depends Test, Setup {   
-  Write-Output "Building WebApp based on image..."
-  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+task Deploy -Depends Test, Setup {
+  Write-Output "Creating app service plan..."
   $params = @(
-    "--name", "$validAcrName",   
-    "--registry-rg", "$ENV:AZURE_RG_NAME", 
-    "--registery-name", "$ENV:AZURE_ACR_NAME",
-    "--docker-custom-image-name", "$ENV:AZURE_ACR_IMAGE_NAME",
-    "$ENV:GITHUB_URI"
+    "--name", "$($ENV:ENV_PREFIX)_webapp_plan",   
+    "--resource-group", "$ENV:AZURE_RG_NAME", 
   )
   $command = [ScriptBlock]::Create("
-      az webapp container up @params
+    az appservice plan create @params
+  ")
+  exec $command
+
+
+  Write-Output "Building WebApp..."
+  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+  $params = @(
+    "--name", "$validAcrName",
+    "--plan", "$($ENV:ENV_PREFIX)_webapp_plan",
+    "--resource-group", "$ENV:AZURE_RG_NAME", 
+    "--deployment-container-image-name", "$validAcrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
+  )
+  $command = [ScriptBlock]::Create("
+    az webapp create @params
   ")
   exec $command
   
