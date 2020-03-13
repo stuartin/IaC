@@ -13,7 +13,7 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-task Deploy -Depends Test, Setup {
+task Build -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
         "--name", "$ENV:AZURE_RG_NAME", 

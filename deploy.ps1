@@ -36,6 +36,11 @@ if ($Bootstrap.IsPresent) {
     }
 }
 
+# setup psakefile
+if ($ENV:PSAKE_FILE_NAME) {
+    $PsakeFile = "$PSScriptRoot\psake\$ENV:PSAKE_FILE_NAME"
+}
+
 # Execute psake task(s)
 if ($PSCmdlet.ParameterSetName -eq 'Help') {
     Get-PSakeScriptTasks -buildFile $PsakeFile |

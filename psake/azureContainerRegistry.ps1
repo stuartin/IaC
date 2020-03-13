@@ -21,7 +21,7 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-task Deploy -Depends Test, Setup {
+task Build -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
         "--name", "$ENV:AZURE_RG_NAME",
@@ -75,5 +75,20 @@ task Deploy -Depends Test, Setup {
     $ErrorActionPreference = 'SilentlyContinue'
     az acr build @params 2> $null
     $ErrorActionPreference = 'Stop'
+
+    Write-Output "Building WebApp based on image..."
+    $params = @(
+      "--name", "$validAcrName",   
+      "--registry-name", "$validAcrName", 
+      "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
+      "$ENV:GITHUB_URI"
+  )
+  $command = [ScriptBlock]::Create("
+      az acr create @params
+      az webapp container up -n AppName --registry-rg ContainerRegistryResourceGroup --registry-name ContainerRegistryName
+  ")
+  exec $command
+  
+
 
 }

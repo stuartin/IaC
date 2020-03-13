@@ -3,6 +3,7 @@ variables:
   ENV_TAG: dev
   ENV_VERSION: v0.0.1  
   ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
+  PSAKE_FILE_NAME: 
   AZURE_LOCATION: australiasoutheast
   AZURE_RG_NAME: $(ENV_PREFIX)_rg
   AZURE_ACR_NAME: $(ENV_PREFIX)_acr
@@ -17,15 +18,40 @@ trigger:
 pool:
   vmImage: 'ubuntu-18.04'
 
-steps:
-  - task: PowerShell@2
-    inputs:
-      filePath: 'deploy.ps1'
-      arguments: '
-        -Bootstrap
-        -Task Deploy
-      '
-      failOnStderr: true
-      pwsh: true
-    env:
-      AZURE_SP_PASSWORD: $(azure.sp.password)
+jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+      job_variable1: value1    # this is only available in job1
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: 'deploy.ps1'
+        arguments: '
+          -Bootstrap
+          -Task Build
+        '
+        failOnStderr: true
+        pwsh: true
+      env:
+        PSAKE_FILE_NAME: 'azureContainerRegistry.ps1'
+        AZURE_SP_PASSWORD: $(azure.sp.password)
+  - job: Deploy
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+      job_variable1: value1    # this is only available in job1
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: 'deploy.ps1'
+        arguments: '
+          -Bootstrap
+          -Task Deploy
+        '
+        failOnStderr: true
+        pwsh: true
+      env:
+        PSAKE_FILE_NAME: 'webApp.ps1'
+        AZURE_SP_PASSWORD: $(azure.sp.password)
