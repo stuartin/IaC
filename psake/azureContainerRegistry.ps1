@@ -65,13 +65,13 @@ task Deploy -Depends Test, Setup {
     # not likely to be changed: https://github.com/Azure/acr/issues/162
     #
     $ErrorActionPreference = 'SilentlyContinue'
-    $command = [ScriptBlock]::Create("
-        az acr build @params 2> $null
-    ")   
-    exec $command 
+    # $command = [ScriptBlock]::Create("
+    #     az acr build @params 2> $null
+    # ")   
+    # exec $command 
 
     # shows job creation output
-    # az acr build @params n>&1
+    az acr build @params 2> $null
 
     
     #az acr build @params
