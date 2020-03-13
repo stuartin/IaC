@@ -72,6 +72,8 @@ task Deploy -Depends Test, Setup {
     # the below will redirect STDERR (Error Stream) to $null, command
     # could fail but would report success
     # needed otherwise builds fail due to above use of az acr build
+    $ErrorActionPreference = 'SilentlyContinue'
     az acr build @params 2> $null
+    $ErrorActionPreference = 'Stop'
 
 }
