@@ -66,7 +66,7 @@ task Deploy -Depends Test, Setup {
     #
     $ErrorActionPreference = 'SilentlyContinue'
     $command = [ScriptBlock]::Create("
-        az acr build @params
+        az acr build @params 2> $null
     ")   
     exec $command 
 
