@@ -17,7 +17,6 @@
   .NOTES
     Author: https://github.com/stuartin
 #>
-$ErrorActionPreference = 'Stop'
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
@@ -59,21 +58,20 @@ task Deploy -Depends Test, Setup {
     )
 
     # acr build throws warning messages to STDERR output stream
-    # causing exec to report a failure, unable to use exec to test for success.
-    # Just execute the command outside of exec.
+    # causing exec to report a failure, unable to use exec to test for success
+    # even when setting $ErrorActionPreferenace
+    # just execute the command outside of exec.
+    # behaviour not likely to be changed: https://github.com/Azure/acr/issues/162
     #
-    # not likely to be changed: https://github.com/Azure/acr/issues/162
-    #
-    $ErrorActionPreference = 'SilentlyContinue'
+    # does not work
     # $command = [ScriptBlock]::Create("
     #     az acr build @params 2> $null
     # ")   
     # exec $command 
 
-    # shows job creation output
+    # the below will redirect STDERR (Error Stream) to $null, command
+    # could fail but would report success
+    # needed otherwise builds fail due to above use of az acr build
     az acr build @params 2> $null
 
-    
-    #az acr build @params
-    $ErrorActionPreference = 'Stop'
 }
