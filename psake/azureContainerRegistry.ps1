@@ -70,7 +70,7 @@ task Deploy -Depends Test, Setup {
     # exec $command 
 
     # shows job creation output
-    az acr build @params n>&1
+    # az acr build @params n>&1
 
     $ErrorActionPreference = 'SilentlyContinue'
     az acr build @params
