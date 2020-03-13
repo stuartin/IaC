@@ -25,34 +25,59 @@ task default -depends Test
 task Deploy -Depends Test, Setup {
   Write-Output "Logging into ACR..."
   $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+  
   $command = [ScriptBlock]::Create("
-      az acr login --name $validAcrName
-  ")   
-  exec $command 
+    az acr credential show --name $validAcrName
+  ")
+  $json = exec $command
+
+  $acrUsername = ($json | ConvertFrom-Json).username
+  $acrPassword = ($json | ConvertFrom-Json).passwords[0].value
+
+  $command = [ScriptBlock]::Create("
+    az acr login --name $validAcrName --username $acrUsername --password $acrPassword
+  ")
+  exec $command
 
   Write-Output "Creating app service plan..."
   $params = @(
     "--name", "$($ENV:ENV_PREFIX)_webapp_plan",   
-    "--resource-group", "$ENV:AZURE_RG_NAME"
+    "--resource-group", "$ENV:AZURE_RG_NAME",
+    "--sku", "F1"
   )
   $command = [ScriptBlock]::Create("
     az appservice plan create @params
   ")
   exec $command
 
-
   Write-Output "Building WebApp..."
+  $validWebAppNameName = ("$($ENV:ENV_PREFIX)_webapp" -replace "[^a-zA-Z0-9]", "").ToLower()
   $params = @(
-    "--name", "$validAcrName",
+    "--name", $validWebAppNameName,
     "--plan", "$($ENV:ENV_PREFIX)_webapp_plan",
     "--resource-group", "$ENV:AZURE_RG_NAME", 
     "--deployment-container-image-name", "$validAcrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
+    "--docker-registry-server-user", "$acrUsername",
+    "--docker-registry-server-password", "$acrPassword"
   )
   $command = [ScriptBlock]::Create("
     az webapp create @params
   ")
   exec $command
   
+<#   Write-Output "Configure app service to access ACR..."
+  $params = @(
+    "--name", "$($ENV:ENV_PREFIX)_webapp",
+    "--resource-group", "$ENV:AZURE_RG_NAME", 
+    "--docker-custom-image-name", "$validAcrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME",
+    "--docker-registry-server-url", "https://$validAcrName.azurecr.io",
+    "--docker-registry-server-user", "$acrUsername",
+    "--docker-registry-server-password", "$acrPassword"
+  )
+  $command = [ScriptBlock]::Create("
+    az webapp config container set @params
+  ")
+  exec $command #>
 
 }
 

@@ -37,7 +37,8 @@ task Build -Depends Test, Setup {
     $params = @(
         "--resource-group", "$ENV:AZURE_RG_NAME", 
         "--name", "$validAcrName",
-        "--sku", "Basic"
+        "--sku", "Basic",
+        "--admin-enabled", "true"
     )
     $command = [ScriptBlock]::Create("
         az acr create @params

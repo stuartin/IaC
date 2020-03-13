@@ -3,7 +3,6 @@ variables:
   ENV_TAG: dev
   ENV_VERSION: v0.0.1  
   ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
-  PSAKE_FILE_NAME: 
   AZURE_LOCATION: australiasoutheast
   AZURE_RG_NAME: $(ENV_PREFIX)_rg
   AZURE_ACR_NAME: $(ENV_PREFIX)_acr
