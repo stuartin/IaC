@@ -18,25 +18,25 @@ pool:
   vmImage: 'ubuntu-18.04'
 
 jobs:
-  - job: Build
-    pool:
-      vmImage: 'ubuntu-18.04'
-    variables:
-      PSAKE_FILE_NAME: 'azureContainerRegistry.ps1'
-    steps:
-    - task: PowerShell@2
-      inputs:
-        filePath: 'deploy.ps1'
-        arguments: '
-          -Bootstrap
-          -Task Build
-        '
-        failOnStderr: true
-        pwsh: true
-      env:
-        AZURE_SP_PASSWORD: $(azure.sp.password)
+#  - job: Build
+#    pool:
+#      vmImage: 'ubuntu-18.04'
+#    variables:
+#      PSAKE_FILE_NAME: 'azureContainerRegistry.ps1'
+#    steps:
+#    - task: PowerShell@2
+#      inputs:
+#        filePath: 'deploy.ps1'
+#        arguments: '
+#          -Bootstrap
+#          -Task Build
+#        '
+#        failOnStderr: true
+#        pwsh: true
+#      env:
+#        AZURE_SP_PASSWORD: $(azure.sp.password)
   - job: Deploy
-    dependsOn: Build
+    #dependsOn: Build
     pool:
       vmImage: 'ubuntu-18.04'
     variables:

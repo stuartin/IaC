@@ -45,11 +45,11 @@ task Build -Depends Test, Setup {
     ")
     exec $command
 
-    Write-Output "Logging into ACR..."
+<#     Write-Output "Logging into ACR..."
     $command = [ScriptBlock]::Create("
         az acr login --name $validAcrName
     ")   
-    exec $command 
+    exec $command  #>
 
     Write-Output "Building and deploying new image..."
     $params = @(
