@@ -69,5 +69,10 @@ task Deploy -Depends Test, Setup {
     # ")   
     # exec $command 
 
+    # still fails
     az acr build @params n>&1
+
+    $ErrorActionPreference = SilentlyContinue
+    az acr build @params
+    $ErrorActionPreference = Stop
 }
