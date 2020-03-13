@@ -64,15 +64,16 @@ task Deploy -Depends Test, Setup {
     #
     # not likely to be changed: https://github.com/Azure/acr/issues/162
     #
-    # $command = [ScriptBlock]::Create("
-    #     az acr build @params
-    # ")   
-    # exec $command 
+    $ErrorActionPreference = 'SilentlyContinue'
+    $command = [ScriptBlock]::Create("
+        az acr build @params
+    ")   
+    exec $command 
 
     # shows job creation output
     # az acr build @params n>&1
 
-    $ErrorActionPreference = 'SilentlyContinue'
-    az acr build @params
+    
+    #az acr build @params
     $ErrorActionPreference = 'Stop'
 }
