@@ -23,6 +23,13 @@ include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
+  Write-Output "Logging into ACR..."
+  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+  $command = [ScriptBlock]::Create("
+      az acr login --name $validAcrName
+  ")   
+  exec $command 
+
   Write-Output "Creating app service plan..."
   $params = @(
     "--name", "$($ENV:ENV_PREFIX)_webapp_plan",   
@@ -35,7 +42,6 @@ task Deploy -Depends Test, Setup {
 
 
   Write-Output "Building WebApp..."
-  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
   $params = @(
     "--name", "$validAcrName",
     "--plan", "$($ENV:ENV_PREFIX)_webapp_plan",
