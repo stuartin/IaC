@@ -26,7 +26,7 @@ task Deploy -Depends Test, Setup {
   Write-Output "Creating app service plan..."
   $params = @(
     "--name", "$($ENV:ENV_PREFIX)_webapp_plan",   
-    "--resource-group", "$ENV:AZURE_RG_NAME", 
+    "--resource-group", "$ENV:AZURE_RG_NAME"
   )
   $command = [ScriptBlock]::Create("
     az appservice plan create @params
