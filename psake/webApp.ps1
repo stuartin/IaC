@@ -27,9 +27,7 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
-  Write-Output "Logging into ACR..."
-  $acrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
-  
+  Write-Output "Logging into ACR..."  
   $command = [ScriptBlock]::Create("
     az acr credential show --name $acrName --output json
   ")
@@ -47,9 +45,8 @@ task Deploy -Depends Test, Setup {
   $ErrorActionPreference = 'Stop'
 
   Write-Output "Creating app service plan..."
-  $webAppName = ("$($ENV:ENV_PREFIX)_webapp" -replace "[^a-zA-Z0-9]", "").ToLower()
   $params = @(
-    "--name", "$($webAppName)-plan",   
+    "--name", "$appServicePlanName",   
     "--resource-group", "$ENV:AZURE_RG_NAME",
     "--sku", "F1",
     "--is-linux"
@@ -61,10 +58,10 @@ task Deploy -Depends Test, Setup {
 
   Write-Output "Building WebApp connected to ACR..."
   $params = @(
-    "--name", $webAppName,
-    "--plan", $appServicePlanName,
+    "--name", "$webAppName",
+    "--plan", "$appServicePlanName",
     "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--deployment-container-image-name", $acrImagePath
+    "--deployment-container-image-name", "$acrImagePath"
     "--docker-registry-server-user", "$acrUsername",
     "--docker-registry-server-password", "$acrPassword"
   )
@@ -75,9 +72,9 @@ task Deploy -Depends Test, Setup {
 
   Write-Output "Configuring web app to use ACR image..."
   $params = @(
-    "--name", $webAppName,
+    "--name", "$webAppName",
     "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--docker-custom-image-name", $acrImagePath
+    "--docker-custom-image-name", "$acrImagePath"
   )
   $command = [ScriptBlock]::Create("
     az webapp config container set @params
