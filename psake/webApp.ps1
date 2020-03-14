@@ -23,6 +23,7 @@ $acrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
 $webAppName = ("$($ENV:ENV_PREFIX)-webapp" -replace "[^a-zA-Z0-9-]", "").ToLower()
 $appServicePlanName = ("$($ENV:ENV_PREFIX)-webapp-plan" -replace "[^a-zA-Z0-9-]", "").ToLower()
 $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
+[System.Uri]$webAppUrl = "https://$webAppName.azurewebsites.net/"
 
 task default -depends Test
 
@@ -80,20 +81,17 @@ task Deploy -Depends Test, Setup {
     az webapp config container set @params
   ")
   exec $command
-  
-<#   Write-Output "Configure app service to access ACR..."
-  $params = @(
-    "--name", "$($ENV:ENV_PREFIX)_webapp",
-    "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--docker-custom-image-name", "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME",
-    "--docker-registry-server-url", "https://$acrName.azurecr.io",
-    "--docker-registry-server-user", "$acrUsername",
-    "--docker-registry-server-password", "$acrPassword"
-  )
-  $command = [ScriptBlock]::Create("
-    az webapp config container set @params
-  ")
-  exec $command #>
+
+  Write-Output "Waiting for webapp to load..."
+  $pollEverySeconds = 5
+  $pollTimeoutSeconds = 600 # 10 Minutes
+  $waitTime = 0
+  $siteResponse = Invoke-WebRequest -Uri $webAppUrl.Host -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue
+  while ( -not ($siteResponse) -and $siteResponse.StatusCode -ne 200 -and $WaitTime -lt $PollTimeoutSeconds) {
+      Start-Sleep -Seconds $PollEverySeconds
+      $WaitTime += $PollEverySeconds
+      $siteResponse = Invoke-WebRequest -Uri $webAppUrl.Host -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue
+  }
 
 }
 
