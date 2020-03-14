@@ -34,10 +34,13 @@ task Deploy -Depends Test, Setup {
   $acrUsername = ($json | ConvertFrom-Json).username
   $acrPassword = ($json | ConvertFrom-Json).passwords[0].value
 
-  $command = [ScriptBlock]::Create("
+<#   $command = [ScriptBlock]::Create("
     az acr login --name $validAcrName --username $acrUsername --password $acrPassword
   ")
-  exec $command
+  exec $command #>
+  $ErrorActionPreference = 'SilentlyContinue'
+  az acr login --name $validAcrName --username $acrUsername --password $acrPassword 2> $null
+  $ErrorActionPreference = 'Stop'
 
   Write-Output "Creating app service plan..."
   $params = @(
