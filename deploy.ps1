@@ -2,7 +2,7 @@
 param(
     # psake file to execute
     [parameter(ParameterSetName = 'task', position = 0)]
-    [string]$PsakeFile = "$PSScriptRoot\psake\azureContainerRegistry.ps1",
+    [string]$PsakeFile = "$PSScriptRoot\psake\resourceGroup.ps1",
 
     # Deploy task(s) to execute
     [parameter(ParameterSetName = 'task', position = 1)]

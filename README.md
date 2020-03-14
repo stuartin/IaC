@@ -108,21 +108,21 @@ Each branch has a seperate pipeline. Only releases in `master` will be deployed 
 Production deployments are handled using github releases/tags.
 
  1. Ensure that all tests and code are working as required.
- 1. Update the `.\azure-pipelines-prod.yml` file with with the current release version to publish
+ 1. Update the `.\azure-pipelines-prod.yml` file with with the current release version to publish and any new variables required from `dev`
     ```yaml
     variables:
       APP_NAME: IaC
       ENV_TAG: prod
-      ENV_VERSION: v0.0.1
+      ENV_VERSION: v0.0.2
       ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
 
     trigger:
-      branches:
+      tags:
         include:
-          - refs/tags/v0.0.1
+        - v0.0.2
     ```
 1. Commit or submit a PR to your master branch.
-1. Create a new release that matches the version in the `.\azure-pipelines-prod.yml` file - _v0.0.1_
+1. Create a new tag/release in your repo that matches the version in the `.\azure-pipelines-prod.yml` file - (_e.g. v0.0.2_)
 1. The production environment will be deployed at the specified version
 
 ## Development
