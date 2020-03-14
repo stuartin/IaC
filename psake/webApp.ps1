@@ -27,7 +27,7 @@ task Deploy -Depends Test, Setup {
   $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
   
   $command = [ScriptBlock]::Create("
-    az acr credential show --name $validAcrName
+    az acr credential show --name $validAcrName --ouput json
   ")
   $json = exec $command
 
