@@ -25,34 +25,22 @@ task default -depends Test
 
 task Build -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
-    $params = @(
-        "--name", "$ENV:AZURE_RG_NAME",
-        "--location", "australiasoutheast"
-    )
-    $command = [ScriptBlock]::Create("
-        az group create @params
-    ")
-    exec $command
+    exec {
+      az group create `
+      --name $ENV:AZURE_RG_NAME `
+      --location "australiasoutheast"
+    }
 
     Write-Output "Creating Azure Container Registry..."
-    $params = @(
-        "--resource-group", "$ENV:AZURE_RG_NAME", 
-        "--name", "$acrName",
-        "--sku", "Basic",
-        "--admin-enabled", "true"
-    )
-    $command = [ScriptBlock]::Create("
-        az acr create @params
-    ")
-    exec $command
+    exec {
+        az acr create `
+        --resource-group $ENV:AZURE_RG_NAME `
+        --name $acrName `
+        --sku "Basic" `
+        --admin-enabled "true"
+    }
 
     Write-Output "Building and deploying new image..."
-    $params = @(
-        "--registry", "$acrName", 
-        "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
-        "$ENV:GITHUB_URI"
-    )
-
     # az acr build throws WARNING messages to STDERR output stream (https://github.com/Azure/acr/issues/162)
     # causing exec (psake) to report a failure, unable to use exec to test for success
     # must execute the command outside of exec.
@@ -69,6 +57,10 @@ task Build -Depends Test, Setup {
     # the below will redirect STDERR (Error Stream) to $null, command
     # could fail but would report success
     $ErrorActionPreference = 'SilentlyContinue'
-    az acr build @params 2> $null
+    az acr build `
+      --registry $acrName `
+      --image $ENV:AZURE_ACR_IMAGE_NAME `
+      $ENV:GITHUB_URI `
+      2> $null
     $ErrorActionPreference = 'Stop'
 }

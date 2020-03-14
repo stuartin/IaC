@@ -14,12 +14,9 @@ task default -depends Test
 
 task Build -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
-    $params = @(
-        "--name", "$ENV:AZURE_RG_NAME", 
-        "--tags", "version=$ENV:ENV_VERSION", "app=$ENV:APP_NAME", "env=$ENV:ENV_TAG"
-    )
-    $command = [ScriptBlock]::Create("
-        az group create @params
-    ")   
-    exec $command 
+    exec {
+      az group create `
+        --name $ENV:AZURE_RG_NAME `
+        --tags version=$ENV:ENV_VERSION,app=$ENV:APP_NAME,env=$ENV:ENV_TAG
+    }
 }

@@ -29,50 +29,40 @@ task default -depends Test
 
 task Deploy -Depends Test, Setup {
   Write-Output "Getting ACR settings..."  
-  $command = [ScriptBlock]::Create("
+  $json = exec {
     az acr credential show --name $acrName --output json
-  ")
-  $json = exec $command
+  }
 
   $acrUsername = ($json | ConvertFrom-Json).username
   $acrPassword = ($json | ConvertFrom-Json).passwords[0].value
 
   Write-Output "Creating app service plan..."
-  $params = @(
-    "--name", "$appServicePlanName",   
-    "--resource-group", "$ENV:AZURE_RG_NAME",
-    "--sku", "F1",
-    "--is-linux"
-  )
-  $command = [ScriptBlock]::Create("
-    az appservice plan create @params
-  ")
-  exec $command
+  exec {
+    az appservice plan create `
+      --name $appServicePlanName `
+      --resource-group $ENV:AZURE_RG_NAME `
+      --sku "F1" `
+      --is-linux
+  }
 
   Write-Output "Building WebApp connected to ACR..."
-  $params = @(
-    "--name", "$webAppName",
-    "--plan", "$appServicePlanName",
-    "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--deployment-container-image-name", "$acrImagePath"
-    "--docker-registry-server-user", "$acrUsername",
-    "--docker-registry-server-password", "$acrPassword"
-  )
-  $command = [ScriptBlock]::Create("
-    az webapp create @params
-  ")
-  exec $command
+  exec {
+    az webapp create `
+      --name $webAppName `
+      --plan $appServicePlanName `
+      --resource-group $ENV:AZURE_RG_NAME `
+      --deployment-container-image-name $acrImagePath `
+      --docker-registry-server-user $acrUsername `
+      --docker-registry-server-password $acrPassword
+  }
 
   Write-Output "Configuring web app to use ACR image..."
-  $params = @(
-    "--name", "$webAppName",
-    "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--docker-custom-image-name", "$acrImagePath"
-  )
-  $command = [ScriptBlock]::Create("
-    az webapp config container set @params
-  ")
-  exec $command
+  exec {
+    az webapp config container set `
+      --name $webAppName `
+      --resource-group $ENV:AZURE_RG_NAME `
+      --docker-custom-image-name $acrImagePath
+  }
 
   Write-Output "Waiting for webapp to load..."
   $pollEverySeconds = 5
