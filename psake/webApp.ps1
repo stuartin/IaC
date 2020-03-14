@@ -17,17 +17,21 @@
   .NOTES
     Author: https://github.com/stuartin
 #>
-
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
+
+$acrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+$webAppName = ("$($ENV:ENV_PREFIX)-webapp" -replace "[^a-zA-Z0-9-]", "").ToLower()
+$appServicePlanName = ("$($ENV:ENV_PREFIX)-webapp-plan" -replace "[^a-zA-Z0-9-]", "").ToLower()
+$acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
   Write-Output "Logging into ACR..."
-  $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
+  $acrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
   
   $command = [ScriptBlock]::Create("
-    az acr credential show --name $validAcrName --output json
+    az acr credential show --name $acrName --output json
   ")
   $json = exec $command
 
@@ -35,31 +39,32 @@ task Deploy -Depends Test, Setup {
   $acrPassword = ($json | ConvertFrom-Json).passwords[0].value
 
 <#   $command = [ScriptBlock]::Create("
-    az acr login --name $validAcrName --username $acrUsername --password $acrPassword
+    az acr login --name $acrName --username $acrUsername --password $acrPassword
   ")
   exec $command #>
   $ErrorActionPreference = 'SilentlyContinue'
-  az acr login --name $validAcrName --username $acrUsername --password $acrPassword 2> $null
+  az acr login --name $acrName --username $acrUsername --password $acrPassword 2> $null
   $ErrorActionPreference = 'Stop'
 
   Write-Output "Creating app service plan..."
+  $webAppName = ("$($ENV:ENV_PREFIX)_webapp" -replace "[^a-zA-Z0-9]", "").ToLower()
   $params = @(
-    "--name", "$($ENV:ENV_PREFIX)_webapp_plan",   
+    "--name", "$($webAppName)-plan",   
     "--resource-group", "$ENV:AZURE_RG_NAME",
-    "--sku", "F1"
+    "--sku", "F1",
+    "--is-linux"
   )
   $command = [ScriptBlock]::Create("
     az appservice plan create @params
   ")
   exec $command
 
-  Write-Output "Building WebApp..."
-  $validWebAppNameName = ("$($ENV:ENV_PREFIX)_webapp" -replace "[^a-zA-Z0-9]", "").ToLower()
+  Write-Output "Building WebApp connected to ACR..."
   $params = @(
-    "--name", $validWebAppNameName,
-    "--plan", "$($ENV:ENV_PREFIX)_webapp_plan",
+    "--name", $webAppName,
+    "--plan", $appServicePlanName,
     "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--deployment-container-image-name", "$validAcrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
+    "--deployment-container-image-name", $acrImagePath
     "--docker-registry-server-user", "$acrUsername",
     "--docker-registry-server-password", "$acrPassword"
   )
@@ -67,13 +72,24 @@ task Deploy -Depends Test, Setup {
     az webapp create @params
   ")
   exec $command
+
+  Write-Output "Configuring web app to use ACR image..."
+  $params = @(
+    "--name", $webAppName,
+    "--resource-group", "$ENV:AZURE_RG_NAME", 
+    "--docker-custom-image-name", $acrImagePath
+  )
+  $command = [ScriptBlock]::Create("
+    az webapp config container set @params
+  ")
+  exec $command
   
 <#   Write-Output "Configure app service to access ACR..."
   $params = @(
     "--name", "$($ENV:ENV_PREFIX)_webapp",
     "--resource-group", "$ENV:AZURE_RG_NAME", 
-    "--docker-custom-image-name", "$validAcrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME",
-    "--docker-registry-server-url", "https://$validAcrName.azurecr.io",
+    "--docker-custom-image-name", "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME",
+    "--docker-registry-server-url", "https://$acrName.azurecr.io",
     "--docker-registry-server-user", "$acrUsername",
     "--docker-registry-server-password", "$acrPassword"
   )
@@ -83,6 +99,5 @@ task Deploy -Depends Test, Setup {
   exec $command #>
 
 }
-
 
 
