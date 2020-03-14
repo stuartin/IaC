@@ -28,7 +28,7 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
-  Write-Output "Logging into ACR..."  
+  Write-Output "Getting ACR settings..."  
   $command = [ScriptBlock]::Create("
     az acr credential show --name $acrName --output json
   ")
@@ -36,14 +36,6 @@ task Deploy -Depends Test, Setup {
 
   $acrUsername = ($json | ConvertFrom-Json).username
   $acrPassword = ($json | ConvertFrom-Json).passwords[0].value
-
-<#   $command = [ScriptBlock]::Create("
-    az acr login --name $acrName --username $acrUsername --password $acrPassword
-  ")
-  exec $command #>
-  $ErrorActionPreference = 'SilentlyContinue'
-  az acr login --name $acrName --username $acrUsername --password $acrPassword 2> $null
-  $ErrorActionPreference = 'Stop'
 
   Write-Output "Creating app service plan..."
   $params = @(
@@ -92,7 +84,7 @@ task Deploy -Depends Test, Setup {
       $WaitTime += $PollEverySeconds
       $siteResponse = Invoke-WebRequest -Uri $webAppUrl.Host -UseBasicParsing -DisableKeepAlive -Method Head -ErrorAction SilentlyContinue
   }
+  
+  Write-Output "Up!"
 
 }
-
-
