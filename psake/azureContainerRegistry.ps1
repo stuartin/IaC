@@ -6,18 +6,20 @@
     [string]ENV:AZURE_RG_NAME - The name of the resource group
 
   .PARAMETER AZURE_ACR_NAME
-    [string]ENV:AZURE_ACR_NAME - The name of the Azure Resource Container (ACR)
+    [string]ENV:AZURE_ACR_NAME - The name of the Azure Container Registry (ACR)
 
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)
 
   .PARAMETER GITHUB_URI
-    [string]ENV:GITHUB_URI - The uri to the public repo (https://github.com/user/repo.git#master:Subfolder)
+    [string]ENV:GITHUB_URI - The uri to the public repo containg a Dockerfile (https://github.com/user/repo.git#master:Subfolder)
   
   .NOTES
     Author: https://github.com/stuartin
 #>
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
+
+$acrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
 
 task default -depends Test
 
@@ -33,10 +35,9 @@ task Build -Depends Test, Setup {
     exec $command
 
     Write-Output "Creating Azure Container Registry..."
-    $validAcrName = ($ENV:AZURE_ACR_NAME -replace "[^a-zA-Z0-9]", "").ToLower()
     $params = @(
         "--resource-group", "$ENV:AZURE_RG_NAME", 
-        "--name", "$validAcrName",
+        "--name", "$acrName",
         "--sku", "Basic",
         "--admin-enabled", "true"
     )
@@ -45,15 +46,9 @@ task Build -Depends Test, Setup {
     ")
     exec $command
 
-<#     Write-Output "Logging into ACR..."
-    $command = [ScriptBlock]::Create("
-        az acr login --name $validAcrName
-    ")   
-    exec $command  #>
-
     Write-Output "Building and deploying new image..."
     $params = @(
-        "--registry", "$validAcrName", 
+        "--registry", "$acrName", 
         "--image", "$ENV:AZURE_ACR_IMAGE_NAME",
         "$ENV:GITHUB_URI"
     )

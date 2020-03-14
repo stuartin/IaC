@@ -6,7 +6,7 @@
     [string]ENV:AZURE_RG_NAME - The name of the resource group
 
   .PARAMETER AZURE_ACR_NAME
-    [string]ENV:AZURE_ACR_NAME - The name of the Azure Resource Container (ACR)
+    [string]ENV:AZURE_ACR_NAME - The name of the Azure Container Registry (ACR)
 
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)

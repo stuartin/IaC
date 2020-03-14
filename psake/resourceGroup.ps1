@@ -8,7 +8,6 @@
   .NOTES
     Author: https://github.com/stuartin
 #>
-
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
