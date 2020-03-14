@@ -1,45 +1,26 @@
+<#
+  .DESCRIPTION
+    Create a new resource group
+
+  .PARAMETER AZURE_RG_NAME
+    [string]ENV:AZURE_RG_NAME - The name of the resource group
+  
+  .NOTES
+    Author: https://github.com/stuartin
+#>
+
 include "$PSScriptRoot\shared\sharedPsakeFile.ps1"
 
 task default -depends Test
 
-<# task Test {
-    Invoke-Pester "$PSScriptRoot\tests"
-}
-
-task Setup -Depends Test {
-    Write-Output "Logging into Azure environment..."
-    $params = @(
-        "--service-principal"
-        "--username", "$ENV:AZURE_SP_USERNAME",
-        "--password", "$ENV:AZURE_SP_PASSWORD",
-        "--tenant", "$ENV:AZURE_SP_TENANTID"
-    )
-    az login @params
-    
-    Write-Output "Setting Azure CLI defaults..."
-    $defaults = @(
-        "location=$ENV:AZURE_LOCATION"
-    )
-    az configure --defaults @defaults
-    az configure --list-defaults
-
-    
-} #>
-
-task Deploy -Depends Test, Setup {
+task Build -Depends Test, Setup {
     Write-Output "Creating Resource Group..."
     $params = @(
         "--name", "$ENV:AZURE_RG_NAME", 
         "--tags", "version=$ENV:ENV_VERSION", "app=$ENV:APP_NAME", "env=$ENV:ENV_TAG"
     )
-    az group create @params
-
-    #az appservice plan create --name $(appserviceplan)  --resource-group $(resourceGroupName) --sku FREE
-    #az webapp create --name $(apiapp) --resource-group $(resourceGroupName) --plan $(appserviceplan) 
-    #az webapp identity assign -g $(resourceGroupName)  -n $(apiapp)
-    #az keyvault create --location "$(location)" --name $(keyvault) --resource-group $(resourceGroupName)
-    
-    
-    #az keyvault set-policy --name  $(keyvault) --object-id %spID% --secret-permissions get  --key-permissions get
-    
+    $command = [ScriptBlock]::Create("
+        az group create @params
+    ")   
+    exec $command 
 }

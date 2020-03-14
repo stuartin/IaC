@@ -1,10 +1,13 @@
 variables:
   APP_NAME: IaC
   ENV_TAG: dev
-  ENV_VERSION: v0.0.1  
+  ENV_VERSION: v0.0.2
   ENV_PREFIX: $(APP_NAME)_$(ENV_TAG)_$(ENV_VERSION)
   AZURE_LOCATION: australiasoutheast
   AZURE_RG_NAME: $(ENV_PREFIX)_rg
+  AZURE_ACR_NAME: $(ENV_PREFIX)_acr
+  AZURE_ACR_IMAGE_NAME: samplewebapp:latest
+  GITHUB_URI: https://github.com/stuartin/az-devops.git#master:SampleWebApp
 
 trigger:
   branches:
@@ -14,15 +17,39 @@ trigger:
 pool:
   vmImage: 'ubuntu-18.04'
 
-steps:
-  - task: PowerShell@2
-    inputs:
-      filePath: 'deploy.ps1'
-      arguments: '
-        -Bootstrap
-        -Task Deploy
-      '
-      failOnStderr: true
-      pwsh: true
-    env:
-      AZURE_SP_PASSWORD: $(azure.sp.password)
+jobs:
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+      PSAKE_FILE_NAME: 'azureContainerRegistry.ps1'
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: 'deploy.ps1'
+        arguments: '
+          -Bootstrap
+          -Task Build
+        '
+        failOnStderr: true
+        pwsh: true
+      env:
+        AZURE_SP_PASSWORD: $(azure.sp.password)
+  - job: Deploy
+    dependsOn: Build
+    pool:
+      vmImage: 'ubuntu-18.04'
+    variables:
+      PSAKE_FILE_NAME: 'webApp.ps1'
+    steps:
+    - task: PowerShell@2
+      inputs:
+        filePath: 'deploy.ps1'
+        arguments: '
+          -Bootstrap
+          -Task Deploy
+        '
+        failOnStderr: true
+        pwsh: true
+      env:
+        AZURE_SP_PASSWORD: $(azure.sp.password)
