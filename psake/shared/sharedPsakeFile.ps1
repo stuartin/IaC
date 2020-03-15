@@ -1,3 +1,8 @@
+FormatTaskName {
+    param($taskName)
+    write-host "Executing Task: $taskName" -ForegroundColor blue
+ }
+
 task Test {
     Invoke-Pester "..\tests"
 }
@@ -17,19 +22,36 @@ task Setup {
     }  
 
     # set cli defaults
-    $defaults = @(
-        "location=$ENV:AZURE_LOCATION"
-    )
-    az configure --defaults @defaults
+    az configure --defaults  "location=$ENV:AZURE_LOCATION"
     az configure --list-defaults
     
     Write-Output "Logging into Azure environment..."
-    $params = @(
-        "--service-principal"
-        "--username", "$ENV:AZURE_SP_USERNAME",
-        "--password", "$ENV:AZURE_SP_PASSWORD",
-        "--tenant", "$ENV:AZURE_SP_TENANTID"
-    )
-    az login @params
+    exec { 
+      az login `
+        --service-principal `
+        --username $ENV:AZURE_SP_USERNAME `
+        --password $ENV:AZURE_SP_PASSWORD `
+        --tenant $ENV:AZURE_SP_TENANTID
+    }
+}
+
+task AddServicePrincipal {
+    param($name, $role, $scope)
+
+    Write-Output "Creating new service principal..."
+    Write-Output "Name: $name"
+    Write-Output "Role: $role"
+    Write-Output "Scope: $scope"
+
+    $json = exec { 
+      az ad sp create-for-rbac `
+        --scopes $scope `
+        --role $role `
+        --name $name `
+        --output json
+    }
+
+    $Script:spUser = $json.appId
+    $Script:spPassword = $json.password
     
 }
