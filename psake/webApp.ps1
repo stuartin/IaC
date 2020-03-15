@@ -11,9 +11,6 @@
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)
 
-  .PARAMETER AZURE_WEBAPP_NAME
-    [string]ENV:AZURE_WEBAPP_NAME - The name of the webapp to deploy
-
   .NOTES
     Author: https://github.com/stuartin
 #>
