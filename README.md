@@ -92,11 +92,13 @@ Each branch has a seperate pipeline. Only releases in `master` will be deployed 
 
 ## Mandatory Pipeline Variables
 
- Name | Type | Description
- --- | --- | ---
- azure.sp.username | string | The application id from the Service Principal
- azure.sp.password | secret | The secret from the Service Principal
- azure.sp.tenantid | string | The tenant id for where the Service Principal exists
+ Name | Type | Description | Required for Service
+ --- | --- | --- | ---
+ azure.sp.username | string | The application id from the Service Principal | *
+ azure.sp.password | secret | The secret from the Service Principal | *
+ azure.sp.tenantid | string | The tenant id for where the Service Principal exists | *
+ azure.aks.sp.username | string | The application id from the Service Principal used for AKS | *
+ azure.aks.sp.password | secret | The secret from the Service Principal used for AKS | *
 
  # Managing Versions/Releases
 
@@ -137,3 +139,12 @@ If you need to roll back **prod** to a previous release, run the prod release pi
 1. Enter **master** for the branch and the **release tag** for the commit
 1. Click **Run**
 
+# Service Specific Installation
+
+## AKS
+
+Requires an existing SP to be created in Azure Active Directory (AAD). This will be used to provision and manage your AKS cluster.
+
+```PowerShell
+az ad sp create-for-rbac --skip-assignment --name aks_app
+```

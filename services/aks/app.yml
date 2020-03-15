@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx0-deployment
+  name: app-deployment
   labels:
-    app: nginx0-deployment
+    app: app-deployment
 spec:
   replicas: 2
   selector:
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: $acrImagePath
+        image: @@acrImagePath@@
         ports:
         - containerPort: 80

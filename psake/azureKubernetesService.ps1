@@ -11,6 +11,12 @@
   .PARAMETER AZURE_ACR_IMAGE_NAME
     [string]ENV:AZURE_ACR_IMAGE_NAME - The name:tag to give the new image in ACR (app:latest)
 
+  .PARAMETER AZURE_AKS_SP_USERNAME
+    [string]ENV:AZURE_AKS_SP_USERNAME - The username (clientId) for the AKS SP
+  
+  .PARAMETER AZURE_AKS_SP_PASSWORD
+    [SecureString]ENV:AZURE_AKS_SP_PASSWORD - The password (secret) for the AKS SP
+
   .NOTES
     Author: https://github.com/stuartin
 #>
@@ -23,39 +29,52 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
-  Write-Output "Current User:"
-  az ad signed-in-user show
 
-  Write-Output "Assign SP permission to create an AKS SP..."
-  Write-Output "TODO"
-<#   $json = exec {
+<#   Write-Output "Assign AKS SP permission to ACR..."
+  $json = exec {
     az account list
   }
   $subscriptionId = ($json | ConvertFrom-Json)[0].id
-  $roleScope = "/subscriptions/$subscriptionId" #>
+  $roleScope = "/subscriptions/$subscriptionId/resourceGroups/$ENV:AZURE_RG_NAME/providers/Microsoft.ContainerRegistry/registries/$acrName"
 
-<#   Write-Output "Creating Azure Kubernetes Service (AKS)..."
+  exec {
+    az role assignment create `
+    --assignee $ENV:AZURE_AKS_SP_USERNAME `
+    --role 'Contributor' `
+    --scope $roleScope
+
+  } #>
+
+  Write-Output "Creating Azure Kubernetes Service (AKS)..."
   exec {
     az aks create `
       --name $aksName `
       --resource-group $ENV:AZURE_RG_NAME `
       --generate-ssh-keys `
-      --attach-acr $acrName
+      --attach-acr $acrName `
+      --service-principal $ENV:AZURE_AKS_SP_USERNAME `
+      --client-secret $ENV:AZURE_AKS_SP_PASSWORD `
+      --verbose
   }
 
   Write-Output "Fetching AKS credentials..."
   exec {
     az aks get-credentials `
-      --name $ENV:AZURE_AKS_NAME `
+      --name $aksName `
       --resource-group $ENV:AZURE_RG_NAME
   }
   
   Write-Output "Using .\services\aks\app.yml to generate AKS app template..."
-  ((Get-Content -path "$PSScriptRoot\services\aks\app.yml" -Raw) -replace '$acrImagePath',$acrImagePath) | Set-Content -Path "$PSScriptRoot\services\aks\app.yml"
+  ((Get-Content -path "$PSScriptRoot\services\aks\app.yml" -Raw) -replace '@@acrImagePath@@',$acrImagePath) | Set-Content -Path "$PSScriptRoot\services\aks\app.yml"
 
   Write-Output "Running AKS deployment..."
   exec {
     kubectl apply -f "$PSScriptRoot\services\aks\app.yml"
-  } #>
+  }
 
+  Write-Output "Pod Status:"
+  exec {
+    kubectl get pods
+  }
+  
 }
