@@ -33,17 +33,23 @@ task Deploy -Depends Test, Setup {
 
   Write-Output "Assign AKS SP permission to ACR..."
   $json = exec {
-    az account list
+    az ad sp list --output json
   }
-  $subscriptionId = ($json | ConvertFrom-Json)[0].id
-  $roleScope = "/subscriptions/$subscriptionId/resourceGroups/$ENV:AZURE_RG_NAME/providers/Microsoft.ContainerRegistry/registries/$acrName"
+  $assignee = ($json | ConvertFrom-Json) | Where-Object {$_.appId -eq $ENV:AZURE_AKS_SP_USERNAME}
+
+  $acrId = exec {
+    az acr show `
+        --name $acrName `
+        --resource-group $ENV:AZURE_RG_NAME `
+        --query "id" `
+        --output tsv
+  }
 
   exec {
     az role assignment create `
-    --assignee $ENV:AZURE_AKS_SP_USERNAME `
+    --assignee-object-id $assignee.objectId `
     --role 'Contributor' `
-    --scope $roleScope
-
+    --scope $acrId
   }
 
   Write-Output "Creating Azure Kubernetes Service (AKS)..."
