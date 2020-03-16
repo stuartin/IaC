@@ -51,6 +51,7 @@ task Deploy -Depends Test, Setup {
       --name $aksName `
       --resource-group $ENV:AZURE_RG_NAME `
       --generate-ssh-keys `
+      --enable-addons monitoring `
       --attach-acr $acrName `
       --service-principal $ENV:AZURE_AKS_SP_USERNAME `
       --client-secret $ENV:AZURE_AKS_SP_PASSWORD `
