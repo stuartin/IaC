@@ -31,7 +31,7 @@ task default -depends Test
 task Deploy -Depends Test, Setup {
   Write-Output "CLIENT_SEC: $ENV:AZURE_AKS_SP_PASSWORD"
 
-<#   Write-Output "Assign AKS SP permission to ACR..."
+  Write-Output "Assign AKS SP permission to ACR..."
   $json = exec {
     az account list
   }
@@ -44,20 +44,21 @@ task Deploy -Depends Test, Setup {
     --role 'Contributor' `
     --scope $roleScope
 
-  } #>
+  }
 
   Write-Output "Creating Azure Kubernetes Service (AKS)..."
-  exec {
-    az aks create `
-      --name $aksName `
-      --resource-group $ENV:AZURE_RG_NAME `
-      --generate-ssh-keys `
-      --enable-addons monitoring `
-      --attach-acr $acrName `
-      --service-principal $ENV:AZURE_AKS_SP_USERNAME `
-      --client-secret $ENV:AZURE_AKS_SP_PASSWORD `
-      --verbose
-  }
+  # az cli throws warnings to stderr can't use exec
+  $ErrorActionPreference = 'SilentlyContinue'
+  az aks create `
+    --name $aksName `
+    --resource-group $ENV:AZURE_RG_NAME `
+    --generate-ssh-keys `
+    --enable-addons monitoring `
+    --attach-acr $acrName `
+    --service-principal $ENV:AZURE_AKS_SP_USERNAME `
+    --client-secret $ENV:AZURE_AKS_SP_PASSWORD `
+    --verbose
+  $ErrorActionPreference = 'Stop'
 
   Write-Output "Fetching AKS credentials..."
   exec {
