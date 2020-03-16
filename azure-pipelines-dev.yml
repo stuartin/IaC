@@ -53,3 +53,4 @@ jobs:
         pwsh: true
       env:
         AZURE_SP_PASSWORD: $(azure.sp.password)
+        AZURE_AKS_SP_PASSWORD: $(azure.aks.sp.password)

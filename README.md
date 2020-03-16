@@ -148,3 +148,12 @@ Requires an existing SP to be created in Azure Active Directory (AAD). This will
 ```PowerShell
 az ad sp create-for-rbac --skip-assignment --name aks_app
 ```
+
+Ensure that the azure.aks.sp.password variable is mapped to the `azure-pipelines.yml` file
+
+```yaml
+    - task: PowerShell@2
+      ...
+      env:
+        AZURE_AKS_SP_PASSWORD: $(azure.aks.sp.password)
+```
