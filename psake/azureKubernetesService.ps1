@@ -29,6 +29,7 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
+  Write-Output "CLIENT_SEC: $ENV:AZURE_AKS_SP_PASSWORD"
 
 <#   Write-Output "Assign AKS SP permission to ACR..."
   $json = exec {
