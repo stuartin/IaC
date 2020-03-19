@@ -29,6 +29,11 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
+  Write-Output "Logging into ACR..."
+  exec {
+    az acr login --name $acrName
+  }
+
   Write-Output "Assign AKS SP permission to ACR..."
   $json = exec {
     az ad sp list --output json
@@ -46,7 +51,7 @@ task Deploy -Depends Test, Setup {
   exec {
     az role assignment create `
     --assignee-object-id $assignee.objectId `
-    --role 'Contributor' `
+    --role 'acrpull' `
     --scope $acrId
   }
 
