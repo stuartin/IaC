@@ -29,10 +29,8 @@ $acrImagePath = "$acrName.azurecr.io/$ENV:AZURE_ACR_IMAGE_NAME"
 task default -depends Test
 
 task Deploy -Depends Test, Setup {
-  Write-Output "CLIENT_SEC: $ENV:AZURE_AKS_SP_PASSWORD"
-
   Write-Output "Assign AKS SP permission to ACR..."
-<#   $json = exec {
+  $json = exec {
     az ad sp list --output json
   }
   $assignee = ($json | ConvertFrom-Json) | Where-Object {$_.appId -eq $ENV:AZURE_AKS_SP_USERNAME}
@@ -50,7 +48,7 @@ task Deploy -Depends Test, Setup {
     --assignee-object-id $assignee.objectId `
     --role 'Contributor' `
     --scope $acrId
-  } #>
+  }
 
   Write-Output "Creating Azure Kubernetes Service (AKS)..."
   # az cli throws warnings to stderr can't use exec
